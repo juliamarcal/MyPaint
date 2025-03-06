@@ -1,15 +1,10 @@
-import utils
+import menu_utils
 
-def apply_transformations(menu, canvas):
+def start_transformations(menu, canvas):
     print("Aplicando transformações")
     create_transformations_menu(menu, canvas)
     
     
 def create_transformations_menu(menu, canvas):
-    buttons = [
-        {"text": "...", "command": lambda: print("Definir Ponto Inicial"), "color": "#6495ED"},
-        {"text": "...", "command": lambda: print("Definir Ponto Final"), "color": "#6495ED"},
-        {"text": "Cancelar", "command": lambda: utils.draw_default_menu(menu, canvas), "color": "red"}
-    ]
-    utils.clear_menu(menu)
-    utils.add_buttons_to_menu(menu, buttons)
+    menu_utils.clear_menu(menu)
+    menu_utils.add_button_to_menu(menu, "Cancelar", lambda: menu_utils.draw_default_menu(menu, canvas), "red")

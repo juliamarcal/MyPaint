@@ -3,7 +3,7 @@ import lines
 import circles
 import transformations
 import clipping
-import utils
+import menu_utils
 
 # window config
 root = tk.Tk()
@@ -20,14 +20,14 @@ canvas.pack(fill="both", expand=True)
 
 # Dictionary of the main menu functions
 menu_functions = {
-    "Reta": lines.draw_line,
-    "Circunferência": circles.draw_circle,
-    "Transformações": transformations.apply_transformations,
-    "Recorte": clipping.apply_clipping
+    "Reta": lines.start_line,
+    "Circunferência": circles.start_circle,
+    "Transformações": transformations.start_transformations,
+    "Recorte": clipping.start_clipping
 }
-utils.set_global_menu_functions(menu_functions)
+menu_utils.set_global_menu_functions(menu_functions)
 
 # Initialize default menu
-utils.draw_default_menu(menu_frame, canvas)
+menu_utils.draw_default_menu(menu_frame, canvas)
 
 root.mainloop()
