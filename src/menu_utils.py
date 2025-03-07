@@ -111,6 +111,43 @@ def add_text_to_menu(menu, text, color="white"):
     label.pack(pady=5)
     return label
 
+def add_slider_to_menu(menu, label, from_, to, command, initial=10):
+    """
+    Adds a slider (Scale) to the menu.
+
+    Parameters:
+    - menu: The Tkinter Frame where the slider will be added.
+    - label: The text label for the slider.
+    - from_: The minimum value of the slider.
+    - to: The maximum value of the slider.
+    - command: A function to call when the slider value changes.
+    - initial: The initial value of the slider.
+    """
+    frame = tk.Frame(menu, bg=menu.cget("bg"))
+    frame.pack(pady=5)
+
+    # Label
+    label_widget = tk.Label(frame, text=label, fg="white", bg=menu.cget("bg"), font=("Arial", 10, "bold"))
+    label_widget.pack()
+
+    # Slider (Scale widget)
+    slider = tk.Scale(
+        frame, 
+        from_=from_, 
+        to=to, 
+        orient="horizontal", 
+        length=200,
+        resolution=1,
+        command=command,
+        bg="gray",
+        fg="white",
+        highlightthickness=0
+    )
+    slider.set(initial)
+    slider.pack()
+
+    return slider
+
 def choose_color():
     """Opens a color chooser and updates the selected color."""
     global selected_color
