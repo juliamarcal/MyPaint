@@ -21,7 +21,12 @@ class CircleDrawer:
         menu_utils.add_text_to_menu(self.menu, "Para criar uma circunferência clique em dois pontos no canvas.\n\nO primeiro ponto será o centro e o segundo será a demarcação para o raio.")
         self.color_button = menu_utils.add_button_to_menu(self.menu, "cor", lambda: self.update_color(), "black", True)
         self.radius_slider = menu_utils.add_slider_to_menu(self.menu, "Raio", from_=5, to=200, command=self.update_radius,initial=50)
-        menu_utils.add_button_to_menu(self.menu, "Voltar", lambda: menu_utils.draw_default_menu(self.menu, self.canvas), "red")
+        menu_utils.add_button_to_menu(self.menu, "Voltar", lambda: self.leave_circles(), "red")
+
+    def leave_circles(self):
+        self.update_radius(50)
+        self.set_selected_color("black")
+        menu_utils.draw_default_menu(self.menu, self.canvas)
 
     def update_color(self):
         color = menu_utils.choose_color()
