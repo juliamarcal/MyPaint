@@ -18,7 +18,7 @@ class LineDrawer:
 
     def create_line_menu(self):
         menu_utils.clear_menu(self.menu)
-        menu_utils.add_text_to_menu(self.menu, "Para Criar uma reta clique em dois pontos no canvas.")
+        menu_utils.add_text_to_menu(self.menu, "Para criar uma reta clique em dois pontos no canvas.")
         self.selected_method = menu_utils.add_dropdown_to_menu(self.menu, ["Bresenham", "DDA"], self.update_method)
         self.color_button = menu_utils.add_button_to_menu(self.menu, "cor", lambda: self.update_color(), "black", True)
         menu_utils.add_button_to_menu(self.menu, "Voltar", lambda: menu_utils.draw_default_menu(self.menu, self.canvas), "red")
