@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import colorchooser
 
-global_menu_functions = {} # Global dictionary for menu functions
+global_menu_functions = {}
 
 def set_global_menu_functions(menu_functions):
     """Sets the global menu functions dictionary."""
@@ -15,7 +15,7 @@ def draw_default_menu(menu, canvas):
     buttons = [
         {
             "text": option, 
-            "command": lambda opt=option: global_menu_functions[opt](menu, canvas),
+            "command": lambda opt=option: global_menu_functions[opt](),
             "color": "#6495ED"
         }
         for option in global_menu_functions
