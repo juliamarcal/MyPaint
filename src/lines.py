@@ -2,6 +2,15 @@ import menu_utils
 import canvas_utils
 import tkinter as tk
 
+class Line:
+    def __init__(self, x1, y1, x2, y2, color, method):
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+        self.color = color
+        self.method = method
+
 class LineDrawer:
     def __init__(self, menu, canvas):
         self.menu = menu
@@ -9,12 +18,31 @@ class LineDrawer:
         self.selected_method = None
         self.x1 = self.y1 = self.x2 = self.y2 = None
         self.selected_color = "black"
-        self.color_button = None  
+        self.color_button = None
+        self.lines = []
 
     def start_line(self):
         """Initialize the line drawing tool."""
         self.create_line_menu()
         self.canvas.bind("<Button-1>", self.get_coordinates)
+
+    def get_stored_lines(self):
+        """Return stored lines"""
+        return self.lines
+    
+    def set_stored_lines(self, line_list):
+        """
+        Sets the stored lines from an external list.
+        
+        :param line_list: List of Line objects
+        """
+        if isinstance(line_list, list) and all(isinstance(line, Line) for line in line_list):
+            self.lines = line_list
+            canvas_utils.clear_canvas(self.canvas)
+            for line in line_list:
+                self.draw_line(line)
+        else:
+            raise ValueError("Invalid format for line_list. Expected a list of Line objects.")
 
     def create_line_menu(self):
         menu_utils.clear_menu(self.menu)
@@ -28,7 +56,6 @@ class LineDrawer:
         self.set_selected_color("black")
         menu_utils.draw_default_menu(self.menu, self.canvas)
         
-
     def update_method(self, value):
         if self.selected_method:
             self.selected_method.set(value)
@@ -55,12 +82,17 @@ class LineDrawer:
             self.x2, self.y2 = event.x, event.y
             print(f"select coord 2: ({self.x2}, {self.y2})")
             canvas_utils.draw_pixel(self.canvas, self.x2, self.y2, self.selected_color)
-            if self.selected_method.get() == "DDA":
-                self.dda(self.x1, self.y1, self.x2, self.y2)
-            else:
-                self.bresenham(self.x1, self.y1, self.x2, self.y2)
+            new_line = Line(self.x1, self.y1, self.x2, self.y2, self.selected_color, self.selected_method)
+            self.draw_line(new_line)
+            self.lines.append(new_line)
             self.x1 = self.y1 = self.x2 = self.y2 = None
 
+    def draw_line(self, line):
+        if line.method == "DDA":
+            self.dda(line.x1, line.y1, line.x2, line.y2)
+        else:
+            self.bresenham(line.x1, line.y1, line.x2, line.y2)
+    
     def dda(self, x1, y1, x2, y2):
         print("starting DDA")
         dx = x2 - x1

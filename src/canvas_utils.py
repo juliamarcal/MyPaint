@@ -26,3 +26,6 @@ def transform_coords_from_center(x, y, canvas):
     new_x = x - width // 2
     new_y = -(y - height // 2)
     return new_x, new_y
+
+def clear_canvas(canvas):
+    canvas.delete("all")

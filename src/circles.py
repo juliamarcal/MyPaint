@@ -2,6 +2,13 @@ import menu_utils
 import canvas_utils
 import tkinter as tk
 
+class Circle:
+    def __init__(self, xc, yc, radius, color):
+        self.xc = xc
+        self.yc = yc
+        self.radius = radius
+        self.color = color
+
 class CircleDrawer:
     def __init__(self, menu, canvas):
         self.menu = menu
@@ -9,12 +16,31 @@ class CircleDrawer:
         self.xc = self.yc = None
         self.radius = None
         self.selected_color = "black"
-        self.color_button = None  
+        self.color_button = None
+        self.circles = [] 
 
     def start_circle(self):
         """Initialize the circle drawing tool."""
         self.create_circle_menu()
         self.canvas.bind("<Button-1>", self.get_coordinates)
+
+    def get_stored_circles(self):
+        """Return stored circles"""
+        return self.circles
+
+    def set_stored_circles(self, circles_list):
+        """
+        Sets the stored circles from an external list.
+        
+        :param circles_list: List of Circle objects
+        """
+        if isinstance(circles_list, list) and all(isinstance(line, Circle) for line in circles_list):
+            self.circles = circles_list
+            canvas_utils.clear_canvas(self.canvas)
+            for circle in circles_list:
+                self.draw_circle(circle)
+        else:
+            raise ValueError("Invalid format for circle_list. Expected a list of Circle objects.")
 
     def create_circle_menu(self):
         menu_utils.clear_menu(self.menu)
@@ -36,8 +62,6 @@ class CircleDrawer:
     def update_radius(self, value):
         """Updates the radius from the slider."""
         self.radius = int(value)
-        print(f"Updated radius: {self.radius}")
-
 
     def set_selected_color(self, color):
         """Updates the selected color."""
@@ -50,31 +74,35 @@ class CircleDrawer:
         self.xc, self.yc = event.x, event.y
         print(f"select center: ({self.xc}, {self.yc})")
         canvas_utils.draw_pixel(self.canvas, self.xc, self.yc, self.selected_color)
-        self.bresenham_circle(self.xc, self.yc, self.radius)
+        new_circle = Circle(self.xc, self.yc, self.radius, self.selected_color)
+        self.draw_circle(new_circle)
+        self.circles.append(new_circle)
         self.xc = self.yc = None 
                   
+    def draw_circle(self, circle):
+        canvas_utils.draw_pixel(self.canvas, circle.xc, circle.yc, circle.color)
+        self.bresenham_circle(circle.xc, circle.yc, circle.radius, circle.color)
 
-    def bresenham_circle(self, xc, yc, r):
+    def bresenham_circle(self, xc, yc, r, color):
         print("starting Bresenham circle")
         x = 0
         y = r
         p = 3 - 2 * r 
         
-        while x < y:
+        while x <= y:
             if (p<0): p += 4 * x + 6
             else:
                 p += 4 * (x - y) + 10
                 y -= 1
             x += 1
-            self.plotSimetrics(x, y, xc, yc)
-        
-                
-    def plotSimetrics(self, a, b, xc, yc):
-        canvas_utils.draw_pixel(self.canvas, (xc + a), (yc + b), self.selected_color)
-        canvas_utils.draw_pixel(self.canvas, (xc + a), (yc - b), self.selected_color)
-        canvas_utils.draw_pixel(self.canvas, (xc - a), (yc + b), self.selected_color)
-        canvas_utils.draw_pixel(self.canvas, (xc - a), (yc - b), self.selected_color)
-        canvas_utils.draw_pixel(self.canvas, (xc + b), (yc + a), self.selected_color)
-        canvas_utils.draw_pixel(self.canvas, (xc + b), (yc - a), self.selected_color)
-        canvas_utils.draw_pixel(self.canvas, (xc - b), (yc + a), self.selected_color)
-        canvas_utils.draw_pixel(self.canvas, (xc - b), (yc - a), self.selected_color)
+            self.plotSimetrics(x, y, xc, yc, color)
+                 
+    def plotSimetrics(self, a, b, xc, yc, color):
+        canvas_utils.draw_pixel(self.canvas, (xc + a), (yc + b), color)
+        canvas_utils.draw_pixel(self.canvas, (xc + a), (yc - b), color)
+        canvas_utils.draw_pixel(self.canvas, (xc - a), (yc + b), color)
+        canvas_utils.draw_pixel(self.canvas, (xc - a), (yc - b), color)
+        canvas_utils.draw_pixel(self.canvas, (xc + b), (yc + a), color)
+        canvas_utils.draw_pixel(self.canvas, (xc + b), (yc - a), color)
+        canvas_utils.draw_pixel(self.canvas, (xc - b), (yc + a), color)
+        canvas_utils.draw_pixel(self.canvas, (xc - b), (yc - a), color)
