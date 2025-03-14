@@ -38,7 +38,6 @@ class LineDrawer:
         """
         if isinstance(line_list, list) and all(isinstance(line, Line) for line in line_list):
             self.lines = line_list
-            canvas_utils.clear_canvas(self.canvas)
             for line in line_list:
                 self.draw_line(line)
         else:
@@ -82,18 +81,27 @@ class LineDrawer:
             self.x2, self.y2 = event.x, event.y
             print(f"select coord 2: ({self.x2}, {self.y2})")
             canvas_utils.draw_pixel(self.canvas, self.x2, self.y2, self.selected_color)
-            new_line = Line(self.x1, self.y1, self.x2, self.y2, self.selected_color, self.selected_method)
+            
+            transformed_x1 = canvas_utils.transform_coords_to_center(self.x1, "x", self.canvas)
+            transformed_y1 = canvas_utils.transform_coords_to_center(self.y1, "y", self.canvas)
+            transformed_x2 = canvas_utils.transform_coords_to_center(self.x2, "x", self.canvas)
+            transformed_y2 = canvas_utils.transform_coords_to_center(self.y2, "y", self.canvas)
+            new_line = Line(transformed_x1, transformed_y1, transformed_x2, transformed_y2, self.selected_color, self.selected_method)
             self.draw_line(new_line)
             self.lines.append(new_line)
             self.x1 = self.y1 = self.x2 = self.y2 = None
 
     def draw_line(self, line):
+        recovered_x1 = canvas_utils.transform_coords_from_center(line.x1, "x", self.canvas)
+        recovered_y1 = canvas_utils.transform_coords_from_center(line.y1, "y", self.canvas)
+        recovered_x2 = canvas_utils.transform_coords_from_center(line.x2, "x", self.canvas)
+        recovered_y2 = canvas_utils.transform_coords_from_center(line.y2, "y", self.canvas)
         if line.method == "DDA":
-            self.dda(line.x1, line.y1, line.x2, line.y2)
+            self.dda(recovered_x1, recovered_y1, recovered_x2, recovered_y2, line.color)
         else:
-            self.bresenham(line.x1, line.y1, line.x2, line.y2)
+            self.bresenham(recovered_x1, recovered_y1, recovered_x2, recovered_y2, line.color)
     
-    def dda(self, x1, y1, x2, y2):
+    def dda(self, x1, y1, x2, y2, color):
         print("starting DDA")
         dx = x2 - x1
         dy = y2 - y1
@@ -106,9 +114,9 @@ class LineDrawer:
         for _ in range(passos):
             x += xincr
             y += yincr
-            canvas_utils.draw_pixel(self.canvas, round(x), round(y), self.selected_color)
+            canvas_utils.draw_pixel(self.canvas, round(x), round(y), color)
 
-    def bresenham(self, x1, y1, x2, y2):
+    def bresenham(self, x1, y1, x2, y2, color):
         print("starting Bresenham")
         dx = abs(x2 - x1)
         dy = abs(y2 - y1)
@@ -116,7 +124,7 @@ class LineDrawer:
         xincr = 1 if x2 > x1 else -1
         yincr = 1 if y2 > y1 else -1
 
-        canvas_utils.draw_pixel(self.canvas, x, y, self.selected_color)
+        canvas_utils.draw_pixel(self.canvas, x, y, color)
 
         if dx > dy:
             p = 2 * dy - dx
@@ -129,7 +137,7 @@ class LineDrawer:
                     p += c2
                 else:
                     p += c1
-                canvas_utils.draw_pixel(self.canvas, x, y, self.selected_color)
+                canvas_utils.draw_pixel(self.canvas, x, y, color)
         else:
             p = 2 * dx - dy
             c1 = 2 * dx
@@ -141,4 +149,4 @@ class LineDrawer:
                     p += c2
                 else:
                     p += c1
-                canvas_utils.draw_pixel(self.canvas, x, y, self.selected_color)
+                canvas_utils.draw_pixel(self.canvas, x, y, color)

@@ -36,7 +36,6 @@ class CircleDrawer:
         """
         if isinstance(circles_list, list) and all(isinstance(line, Circle) for line in circles_list):
             self.circles = circles_list
-            canvas_utils.clear_canvas(self.canvas)
             for circle in circles_list:
                 self.draw_circle(circle)
         else:
@@ -46,7 +45,7 @@ class CircleDrawer:
         menu_utils.clear_menu(self.menu)
         menu_utils.add_text_to_menu(self.menu, "Para criar uma circunferência clique em dois pontos no canvas.\n\nO primeiro ponto será o centro e o segundo será a demarcação para o raio.")
         self.color_button = menu_utils.add_button_to_menu(self.menu, "cor", lambda: self.update_color(), "black", True)
-        self.radius_slider = menu_utils.add_slider_to_menu(self.menu, "Raio", from_=5, to=200, command=self.update_radius,initial=50)
+        menu_utils.add_slider_to_menu(self.menu, "Raio", from_=5, to=200, command=self.update_radius,initial=50)
         menu_utils.add_button_to_menu(self.menu, "Voltar", lambda: self.leave_circles(), "red")
 
     def leave_circles(self):
@@ -72,16 +71,22 @@ class CircleDrawer:
 
     def get_coordinates(self, event):
         self.xc, self.yc = event.x, event.y
-        print(f"select center: ({self.xc}, {self.yc})")
+        print(f"Clicked at:  ({self.xc}, {self.yc})")
+        
+        transformed_x = canvas_utils.transform_coords_to_center(self.xc, "x", self.canvas)
+        transformed_y = canvas_utils.transform_coords_to_center(self.yc, "y", self.canvas)
+        print(f"Transformed to: ({transformed_x}, {transformed_y})")
+
         canvas_utils.draw_pixel(self.canvas, self.xc, self.yc, self.selected_color)
-        new_circle = Circle(self.xc, self.yc, self.radius, self.selected_color)
+        new_circle = Circle(transformed_x, transformed_y, self.radius, self.selected_color)
         self.draw_circle(new_circle)
         self.circles.append(new_circle)
         self.xc = self.yc = None 
                   
     def draw_circle(self, circle):
-        canvas_utils.draw_pixel(self.canvas, circle.xc, circle.yc, circle.color)
-        self.bresenham_circle(circle.xc, circle.yc, circle.radius, circle.color)
+        recovered_x = canvas_utils.transform_coords_from_center(circle.xc, "x", self.canvas)
+        recovered_y = canvas_utils.transform_coords_from_center(circle.yc, "y", self.canvas)
+        self.bresenham_circle(recovered_x, recovered_y, circle.radius, circle.color)
 
     def bresenham_circle(self, xc, yc, r, color):
         print("starting Bresenham circle")

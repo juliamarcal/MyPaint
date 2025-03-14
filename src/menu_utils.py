@@ -65,7 +65,7 @@ def add_button_to_menu(menu, text, command, color, return_button=False):
     if return_button:
         return button
 
-def add_dropdown_to_menu(menu, options, command):
+def add_dropdown_to_menu(menu, options, command, defaut_value=""):
     """
     Adds a dropdown (OptionMenu) to the menu without a label.
 
@@ -78,7 +78,10 @@ def add_dropdown_to_menu(menu, options, command):
     frame.pack(pady=0)
 
     selected_option = tk.StringVar()
-    selected_option.set(options[0])  # Default value
+    if (defaut_value == ""):
+        selected_option.set(options[0])
+    else:
+        selected_option.set(defaut_value)
 
     # Pass the command directly without using lambda
     dropdown = tk.OptionMenu(frame, selected_option, *options, command=command)

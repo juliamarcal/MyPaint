@@ -1,6 +1,6 @@
 import tkinter as tk
 from circles import CircleDrawer
-import transformations
+from transformations import Transformations
 import clipping
 import menu_utils
 from lines import LineDrawer
@@ -21,6 +21,7 @@ canvas.pack(fill="both", expand=True)
 # Create dawers
 line_drawer = LineDrawer(menu_frame, canvas)
 circle_drawer = CircleDrawer(menu_frame, canvas)
+transformations = Transformations(line_drawer, circle_drawer, canvas, menu_frame)
 
 # Dictionary of the main menu functions
 menu_functions = {
