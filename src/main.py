@@ -8,7 +8,7 @@ from lines import LineDrawer
 # window config
 root = tk.Tk()
 root.title("Computação Gráfica - MyPaint")
-root.geometry("800x600")
+root.geometry("1000x800")
 
 # create menu
 menu_frame = tk.Frame(root, width=200, bg="gray")

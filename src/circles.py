@@ -41,11 +41,15 @@ class CircleDrawer:
         else:
             raise ValueError("Invalid format for circle_list. Expected a list of Circle objects.")
 
+    def redraw_all_circles(self):
+        for circle in self.circles:
+                self.draw_circle(circle)
+
     def create_circle_menu(self):
         menu_utils.clear_menu(self.menu)
         menu_utils.add_text_to_menu(self.menu, "Para criar uma circunferência clique em dois pontos no canvas.\n\nO primeiro ponto será o centro e o segundo será a demarcação para o raio.")
         self.color_button = menu_utils.add_button_to_menu(self.menu, "cor", lambda: self.update_color(), "black", True)
-        menu_utils.add_slider_to_menu(self.menu, "Raio", from_=5, to=200, command=self.update_radius,initial=50)
+        menu_utils.add_slider_to_menu(self.menu, "Raio", from_=1, to=200, command=self.update_radius,initial=100)
         menu_utils.add_button_to_menu(self.menu, "Voltar", lambda: self.leave_circles(), "red")
 
     def leave_circles(self):
@@ -86,6 +90,9 @@ class CircleDrawer:
     def draw_circle(self, circle):
         recovered_x = canvas_utils.transform_coords_from_center(circle.xc, "x", self.canvas)
         recovered_y = canvas_utils.transform_coords_from_center(circle.yc, "y", self.canvas)
+        print(f"circle -> x = {circle.xc}, y = {circle.yc}")
+        print(f"circle recovered -> x = {recovered_x}, y = {recovered_y}")
+        canvas_utils.draw_pixel(self.canvas, recovered_x, recovered_y)
         self.bresenham_circle(recovered_x, recovered_y, circle.radius, circle.color)
 
     def bresenham_circle(self, xc, yc, r, color):

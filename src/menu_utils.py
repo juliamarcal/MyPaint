@@ -38,7 +38,7 @@ def add_buttons_to_menu(menu, buttons_config):
             font=("Arial", 10),
             bg=btn["color"],
             fg=btn.get("fg", "white"),
-            width=20,
+            width=25,
             height=1,
             padx=5, 
             pady=5,
@@ -54,7 +54,7 @@ def add_button_to_menu(menu, text, command, color, return_button=False):
         font=("Arial", 10),
         bg=color,
         fg="white",
-        width=20,
+        width=25,
         height=1,
         padx=5, 
         pady=5,
@@ -83,14 +83,13 @@ def add_dropdown_to_menu(menu, options, command, defaut_value=""):
     else:
         selected_option.set(defaut_value)
 
-    # Pass the command directly without using lambda
     dropdown = tk.OptionMenu(frame, selected_option, *options, command=command)
 
     dropdown.config(
         font=("Arial", 10), 
         bg="#6495ED",
         fg="white",
-        width=20,
+        width=25,
         height=1,
         padx=5, 
         pady=5,    
@@ -110,7 +109,7 @@ def add_text_to_menu(menu, text, color="white"):
     - text: The text to display.
     - color: The text color (default: white).
     """
-    label = tk.Label(menu, text=text, fg=color, bg=menu.cget("bg"), font=("Arial", 10, "bold"), wraplength=menu.winfo_width())
+    label = tk.Label(menu, text=text, fg=color, bg=menu.cget("bg"), font=("Arial", 10, "bold"), wraplength=200)
     label.pack(pady=5)
     return label
 
