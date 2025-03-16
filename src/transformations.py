@@ -1,8 +1,6 @@
 import math
 import menu_utils
 import canvas_utils
-import lines
-import circles
 
 class Transformations:
     def __init__(self, line_drawer, circle_drawer, canvas, menu):
@@ -67,7 +65,7 @@ class Transformations:
         
         menu_utils.add_button_to_menu(self.menu, "Voltar", lambda: self.leave_transformations(), "red")
 
-    # translation  OKAY
+    # translation
     def draw_translation_menu(self):
         menu_utils.add_slider_to_menu(self.menu, "Translação em x (em pixels)", -100, 100, lambda  valor: self.update_slider_value(valor, "slider1"), initial=0)
         menu_utils.add_slider_to_menu(self.menu, "Translação em y (em pixels)", -100, 100, lambda  valor: self.update_slider_value(valor, "slider2"), initial=0)
@@ -94,7 +92,7 @@ class Transformations:
         self.line_drawer.set_stored_lines(lines)
         self.circle_drawer.set_stored_circles(circles)
 
-    # scaling OKAY
+    # scaling
     def draw_scaling_menu(self):
         menu_utils.add_slider_to_menu(self.menu, "escala em x", -50, 50, lambda  valor: self.update_slider_value(valor, "slider1"), initial=0)
         menu_utils.add_slider_to_menu(self.menu, "escala em y", -50, 50, lambda  valor: self.update_slider_value(valor, "slider2"), initial=0)
@@ -141,7 +139,7 @@ class Transformations:
         self.line_drawer.set_stored_lines(lines)
         self.circle_drawer.set_stored_circles(circles)
 
-    # rotation OKAY
+    # rotation
     def draw_rotation_menu(self):
         menu_utils.add_slider_to_menu(self.menu, "Rotação em graus", -180, 180, lambda  valor: self.update_slider_value(valor, "slider1"), initial=0)
         menu_utils.add_button_to_menu(self.menu, "Aplicar rotação", lambda: self.apply_rotation(), "#6495ED")
@@ -178,7 +176,7 @@ class Transformations:
         self.line_drawer.set_stored_lines(lines)
         self.circle_drawer.redraw_all_circles()
 
-    # reflection OKAY
+    # reflection
     def draw_reflection_menu(self):
         menu_utils.add_dropdown_to_menu(self.menu, ["Eixo X", "Eixo Y"], lambda value: self.update_dropdown_value(value))
         menu_utils.add_button_to_menu(self.menu, "Aplicar reflexão", lambda: self.apply_reflexion(), "#6495ED")
