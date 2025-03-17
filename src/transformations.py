@@ -3,7 +3,19 @@ import menu_utils
 import canvas_utils
 
 class Transformations:
+    """
+    A class to handle various 2D geometric transformations including translation, scaling,
+    rotation, reflection, and shearing on a canvas.
+    """
     def __init__(self, line_drawer, circle_drawer, canvas, menu):
+        """
+        Initializes the Transformations class with drawing utilities and menu elements.
+        
+        :param line_drawer: Object responsible for drawing and managing lines.
+        :param circle_drawer: Object responsible for drawing and managing circles.
+        :param canvas: The canvas object where transformations are applied.
+        :param menu: The menu object used to interact with transformations.
+        """
         self.line_drawer = line_drawer
         self.circle_drawer = circle_drawer
         self.canvas = canvas
@@ -20,33 +32,17 @@ class Transformations:
         self.slider1_value = 0
         self.slider2_value = 0
         self.dropdown1_value = 0
-        
-    def update_dropdown_value(self, eixo):
-        """Atualiza a translação no eixo selecionado e no valor do slider."""
-        print(f"Eixo selecionado: {eixo}")
-        self.dropdown1_value = eixo
-
-    def update_slider_value(self, value, slider_id):
-        """Function that receives the value of the slider and the identifier of the slider, and updates the corresponding slider value."""
-        if slider_id == "slider1":
-            self.slider1_value = int(value)
-            print(f"Slider 1 = {value}")
-        elif slider_id == "slider2":
-            self.slider2_value = int(value)
-            print(f"Slider 2 = {value}")
-
+    
     def start_transformations(self):
-        print("Aplicando transformações")
+        """Begins the transformation process by displaying the default menu (Translation)."""
         self.draw_transformation_menu("Translação")
     
-    def leave_transformations(self):
-        self.slider1_value = 0
-        self.slider2_value = 0
-        self.dropdown1_value = 0
-        menu_utils.draw_default_menu(self.menu, self.canvas)
-    
     def draw_transformation_menu(self, transformation_name):
-        """Clears the menu, adds the dropdown, calls the specific transformation menu, and adds return button."""
+        """
+        Clears the menu and displays the options for the selected transformation.
+        
+        :param transformation_name: The name of the transformation to be applied.
+        """
         menu_utils.clear_menu(self.menu)
         
         self.slider1_value = 0
@@ -64,17 +60,42 @@ class Transformations:
             self.transformation_menus[transformation_name]()
         
         menu_utils.add_button_to_menu(self.menu, "Voltar", lambda: self.leave_transformations(), "red")
+    
+    def leave_transformations(self):
+        """Resets transformation values and returns to the default menu."""
+        self.slider1_value = 0
+        self.slider2_value = 0
+        self.dropdown1_value = 0
+        menu_utils.draw_default_menu(self.menu, self.canvas)
+
+    # dinamic updates
+    def update_dropdown_value(self, eixo):
+        """Updates the selected axis for transformations."""
+        self.dropdown1_value = eixo
+
+    def update_slider_value(self, value, slider_id):
+        """
+        Updates the value of the specified slider.
+        
+        :param value: The new value for the slider.
+        :param slider_id: Identifier of the slider ('slider1' or 'slider2').
+        """
+        if slider_id == "slider1":
+            self.slider1_value = int(value)
+        elif slider_id == "slider2":
+            self.slider2_value = int(value)
 
     # translation
     def draw_translation_menu(self):
+        """Displays the translation menu options in the UI."""
         menu_utils.add_slider_to_menu(self.menu, "Translação em x (em pixels)", -100, 100, lambda  valor: self.update_slider_value(valor, "slider1"), initial=0)
         menu_utils.add_slider_to_menu(self.menu, "Translação em y (em pixels)", -100, 100, lambda  valor: self.update_slider_value(valor, "slider2"), initial=0)
         menu_utils.add_button_to_menu(self.menu, "Aplicar translação", lambda: self.apply_translation(), "#6495ED")
             
     def apply_translation(self):
-        """Applies translation using the pixel values for x and y axis."""
+        """Applies translation using the pixel values for x and y axes."""
         
-        print("Applying translation")
+        print(f"Applying translation T({self.slider1_value}, {self.slider2_value})")
         canvas_utils.clear_canvas(self.canvas)
         lines = self.line_drawer.get_stored_lines()
         circles = self.circle_drawer.get_stored_circles()
@@ -94,13 +115,14 @@ class Transformations:
 
     # scaling
     def draw_scaling_menu(self):
+        """Displays the scaling menu options in the UI."""
         menu_utils.add_slider_to_menu(self.menu, "escala em x", -50, 50, lambda  valor: self.update_slider_value(valor, "slider1"), initial=0)
         menu_utils.add_slider_to_menu(self.menu, "escala em y", -50, 50, lambda  valor: self.update_slider_value(valor, "slider2"), initial=0)
         menu_utils.add_button_to_menu(self.menu, "Aplicar escala", lambda: self.apply_scaling(), "#6495ED")
     
     def apply_scaling(self):
-        """Applies scaling using the value for x and y"""
-        print("Applying scaling")
+        """Applies scaling transformation based on the slider values."""
+        print(f"Applying scaling S({self.slider1_value}, {self.slider2_value})")
 
         canvas_utils.clear_canvas(self.canvas)
         lines = self.line_drawer.get_stored_lines()
@@ -108,10 +130,6 @@ class Transformations:
         
         center_x = 0
         center_y = 0
-        
-        print("\n=== Linhas antes da escala ===")
-        for line in lines:
-            print(f"Antes: ({line.x1}, {line.y1}) -> ({line.x2}, {line.y2})")
 
         for line in lines:
             line.x1 = (line.x1 - center_x) * self.slider1_value + center_x
@@ -119,28 +137,17 @@ class Transformations:
             line.x2 = (line.x2 - center_x) * self.slider1_value + center_x
             line.y2 = (line.y2 - center_y) * self.slider2_value + center_y
 
-        print("\n=== Linhas depois da escala ===")
-        for line in lines:
-            print(f"Depois: ({line.x1}, {line.y1}) -> ({line.x2}, {line.y2})")
-
-        print("\n=== Círculos antes da escala ===")
-        for circle in circles:
-            print(f"Antes: centro=({circle.xc}, {circle.yc}), raio={circle.radius}")
-
         for circle in circles:
             circle.xc = (circle.xc - center_x) * self.slider1_value + center_x
             circle.yc = (circle.yc - center_y) * self.slider2_value + center_y
             circle.radius *= abs(self.slider1_value) # radius must not be negative
-
-        print("\n=== Círculos depois da escala ===")
-        for circle in circles:
-            print(f"Depois: centro=({circle.xc}, {circle.yc}), raio={circle.radius}")
 
         self.line_drawer.set_stored_lines(lines)
         self.circle_drawer.set_stored_circles(circles)
 
     # rotation
     def draw_rotation_menu(self):
+        """Displays the rotation menu options in the UI."""
         menu_utils.add_slider_to_menu(self.menu, "Rotação em graus", -180, 180, lambda  valor: self.update_slider_value(valor, "slider1"), initial=0)
         menu_utils.add_button_to_menu(self.menu, "Aplicar rotação", lambda: self.apply_rotation(), "#6495ED")
 
@@ -178,10 +185,13 @@ class Transformations:
 
     # reflection
     def draw_reflection_menu(self):
+        """Displays the reflection menu options in the UI."""
         menu_utils.add_dropdown_to_menu(self.menu, ["Eixo X", "Eixo Y"], lambda value: self.update_dropdown_value(value))
         menu_utils.add_button_to_menu(self.menu, "Aplicar reflexão", lambda: self.apply_reflexion(), "#6495ED")
 
     def apply_reflexion(self):
+        """Applies reflection to stored lines and circles using dropdown1_value (axis)."""
+        print(f"Applying reflexion on \"{self.dropdown1_value}\"")
         canvas_utils.clear_canvas(self.canvas)
         lines = self.line_drawer.get_stored_lines()
         circles = self.circle_drawer.get_stored_circles()
@@ -207,11 +217,15 @@ class Transformations:
 
     # shearing
     def draw_shearing_menu(self):
+        """Displays the shearing menu options in the UI."""
         menu_utils.add_dropdown_to_menu(self.menu, ["Eixo X", "Eixo Y"], lambda value: self.update_dropdown_value(value))
         menu_utils.add_slider_to_menu(self.menu, "Deformaçaõ (em pixels)", -2.0, 2.0, lambda  valor: self.update_slider_value(valor, "slider1"), initial=0)
         menu_utils.add_button_to_menu(self.menu, "Aplicar cisilhamento", lambda: self.apply_shearing(), "#6495ED")
     
     def apply_shearing(self):
+        """Applies shearing to stored lines using dropdown1_value (axis) and slider1_value (deformation factor)."""
+
+        print("Applying sheering in \"{self.dropdown1_value}\" whith deformation of factor {self.slider1_value}")
         canvas_utils.clear_canvas(self.canvas)
         lines = self.line_drawer.get_stored_lines()
 

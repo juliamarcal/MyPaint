@@ -1,16 +1,23 @@
 import tkinter as tk
 from tkinter import colorchooser
 
+# Global dictionary to store menu functions
 global_menu_functions = {}
 
 def set_global_menu_functions(menu_functions):
-    """Sets the global menu functions dictionary."""
+    """
+    Sets the global dictionary of menu functions.
+    """
     global global_menu_functions
     global_menu_functions = menu_functions
 
 def draw_default_menu(menu, canvas):
     """
     Creates the default menu dynamically using global_menu_functions.
+    
+    :Parameters:
+    - menu (tk.Frame): The Tkinter frame where menu buttons will be placed.
+    - canvas (tk.Canvas): The canvas where drawing operations occur (not used in this function but can be extended).
     """
     buttons = [
         {
@@ -25,12 +32,23 @@ def draw_default_menu(menu, canvas):
     add_button_to_menu(menu, "Limpar canvas", global_menu_functions["Clear"], "red")
 
 def clear_menu(menu):
-    """Removes all widgets from menu."""
+    """
+    Removes all widgets from the given menu.
+    
+    :Parameters:
+    - menu (tk.Frame): The menu frame to be cleared.
+    """
     for widget in menu.winfo_children():
         widget.destroy()
 
 def add_buttons_to_menu(menu, buttons_config):
-    """Creates buttons dynamically in the menu."""
+    """
+    Creates buttons dynamically in the menu based on a given configuration.
+    
+    :Parameters:
+    - menu (tk.Frame): The menu frame where buttons will be added.
+    - buttons_config (list of dict): List of button configurations with keys "text", "command", and optional "color".
+    """
     default_color="#6495ED"
     for btn in buttons_config:
         button = tk.Button(
@@ -48,7 +66,19 @@ def add_buttons_to_menu(menu, buttons_config):
         button.pack(padx=20, pady=10)
 
 def add_button_to_menu(menu, text, command, color="#6495ED", return_button=False):
-    """Creates a button and optionally returns the reference to the button."""
+    """
+    Creates a button in the menu and optionally returns it.
+    
+    :Parameters:
+    - menu (tk.Frame): The menu frame where the button will be added.
+    - text (str): The button label.
+    - command (callable): The function to execute when the button is clicked.
+    - color (str, optional): The background color of the button. Default is "#6495ED".
+    - return_button (bool, optional): Whether to return the button instance. Default is False.
+    
+    :Returns:
+    - tk.Button (optional): The created button instance if return_button is True.
+    """
     button = tk.Button(
         menu, 
         text=text, 
@@ -69,11 +99,15 @@ def add_button_to_menu(menu, text, command, color="#6495ED", return_button=False
 def add_dropdown_to_menu(menu, options, command, defaut_value=""):
     """
     Adds a dropdown (OptionMenu) to the menu without a label.
-
-    Parameters:
-    - menu: The Tkinter Frame where the dropdown will be added.
-    - options: A list of options for the dropdown.
-    - command: A function to call when an option is selected.
+    
+    :Parameters:
+    - menu (tk.Frame): The menu frame where the dropdown will be added.
+    - options (list): List of options for the dropdown.
+    - command (callable): The function to call when an option is selected.
+    - default_value (str, optional): The initially selected value. Defaults to the first option.
+    
+    :Returns:
+    - tk.StringVar: The variable holding the selected option.
     """
     frame = tk.Frame(menu, bg="gray")
     frame.pack(pady=0)
@@ -104,11 +138,14 @@ def add_dropdown_to_menu(menu, options, command, defaut_value=""):
 def add_text_to_menu(menu, text, color="white"):
     """
     Adds a text label to the menu.
-
-    Parameters:
-    - menu: The Tkinter Frame where the text will be added.
-    - text: The text to display.
-    - color: The text color (default: white).
+    
+    :Parameters:
+    - menu (tk.Frame): The menu frame where the text will be added.
+    - text (str): The text to display.
+    - color (str, optional): The text color. Default is "white".
+    
+    :Returns:
+    - tk.Label: The created label instance.
     """
     label = tk.Label(menu, text=text, fg=color, bg=menu.cget("bg"), font=("Arial", 10, "bold"), wraplength=200)
     label.pack(pady=5)
@@ -117,14 +154,17 @@ def add_text_to_menu(menu, text, color="white"):
 def add_slider_to_menu(menu, label, from_, to, command, initial=10):
     """
     Adds a slider (Scale) to the menu.
-
-    Parameters:
-    - menu: The Tkinter Frame where the slider will be added.
-    - label: The text label for the slider.
-    - from_: The minimum value of the slider.
-    - to: The maximum value of the slider.
-    - command: A function to call when the slider value changes.
-    - initial: The initial value of the slider.
+    
+    :Parameters:
+    - menu (tk.Frame): The menu frame where the slider will be added.
+    - label (str): The text label for the slider.
+    - from_ (int): The minimum value of the slider.
+    - to (int): The maximum value of the slider.
+    - command (callable): The function to call when the slider value changes.
+    - initial (int, optional): The initial value of the slider. Default is 10.
+    
+    :Returns:
+    - tk.Scale: The created slider instance.
     """
     frame = tk.Frame(menu, bg=menu.cget("bg"))
     frame.pack(pady=5)
@@ -152,10 +192,15 @@ def add_slider_to_menu(menu, label, from_, to, command, initial=10):
     return slider
 
 def choose_color():
-    """Opens a color chooser and updates the selected color."""
+    """
+    Opens a color chooser dialog and updates the selected color.
+    
+    :Returns:
+    - str: The selected color in hex format (e.g., "#FF0000").
+    """
     global selected_color
     color = colorchooser.askcolor(title="Escolha uma cor")[1]  # Open color picker
-    if color:  # If a color was selected
+    if color:
         selected_color = color
         print(f"Selected color: {selected_color}")
-    return selected_color  # Return the chosen color
+    return selected_color

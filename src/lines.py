@@ -3,6 +3,9 @@ import canvas_utils
 import tkinter as tk
 
 class Line:
+    """
+    Represents a line with specified coordinates, color, and drawing method.
+    """
     def __init__(self, x1, y1, x2, y2, color, method):
         self.x1 = x1
         self.y1 = y1
@@ -10,9 +13,24 @@ class Line:
         self.y2 = y2
         self.color = color
         self.method = method
+    
+    def __repr__(self):
+        """
+        Returns a string representation of the line.
+        """
+        return f"Line(x1={self.x1}, y1={self.y1}, x2={self.x2}, y2={self.y2})"
 
 class LineDrawer:
+    """
+    Handles line drawing operations on a canvas.
+    """
     def __init__(self, menu, canvas):
+        """
+        Initializes the LineDrawer with a menu and canvas.
+        
+        :param menu: The menu where options will be displayed.
+        :param canvas: The drawing canvas.
+        """
         self.menu = menu
         self.canvas = canvas
         self.selected_method = None
@@ -22,12 +40,36 @@ class LineDrawer:
         self.lines = []
 
     def start_line(self):
-        """Initialize the line drawing tool."""
+        """
+        Initializes the line drawing tool by setting up the menu and event bindings.
+        """
         self.create_line_menu()
         self.canvas.bind("<Button-1>", self.get_coordinates)
 
+    def create_line_menu(self):
+        """
+        Creates a menu for line drawing options, including method selection and color choice.
+        """
+        menu_utils.clear_menu(self.menu)
+        menu_utils.add_text_to_menu(self.menu, "Para criar uma reta clique em dois pontos no canvas.")
+        self.selected_method = menu_utils.add_dropdown_to_menu(self.menu, ["Bresenham", "DDA"], self.update_method)
+        self.color_button = menu_utils.add_button_to_menu(self.menu, "cor", lambda: self.update_color(), "black", True)
+        menu_utils.add_button_to_menu(self.menu, "Voltar", lambda: self.leave_lines(), "red")
+
+    def leave_lines(self):
+        """
+        Resets the line settings and returns to the default menu.
+        """
+        self.selected_method.set("Bresenham")
+        self.set_selected_color("black")
+        menu_utils.draw_default_menu(self.menu, self.canvas)
+        self.x1 = self.y1 = self.x2 = self.y2 = None
+
+    # stored lines functions
     def get_stored_lines(self):
-        """Return stored lines"""
+        """
+        Returns the list of stored lines.
+        """
         return self.lines
     
     def set_stored_lines(self, line_list):
@@ -43,69 +85,91 @@ class LineDrawer:
         else:
             raise ValueError("Invalid format for line_list. Expected a list of Line objects.")
 
-    def create_line_menu(self):
-        menu_utils.clear_menu(self.menu)
-        menu_utils.add_text_to_menu(self.menu, "Para criar uma reta clique em dois pontos no canvas.")
-        self.selected_method = menu_utils.add_dropdown_to_menu(self.menu, ["Bresenham", "DDA"], self.update_method)
-        self.color_button = menu_utils.add_button_to_menu(self.menu, "cor", lambda: self.update_color(), "black", True)
-        menu_utils.add_button_to_menu(self.menu, "Voltar", lambda: self.leave_lines(), "red")
+    def reset(self):
+        """
+        Clears all stored lines.
+        """
+        self.lines = []
 
-    def leave_lines(self):
-        self.selected_method.set("Bresenham")
-        self.set_selected_color("black")
-        menu_utils.draw_default_menu(self.menu, self.canvas)
-        
+    # dinamic updates
     def update_method(self, value):
+        """
+        Updates the selected line drawing method.
+        
+        :param value: Selected method (Bresenham or DDA).
+        """
         if self.selected_method:
             self.selected_method.set(value)
-            print("Selected method:", self.selected_method.get())
+            print("Selected method for line:", self.selected_method.get())
 
     def update_color(self):
+        """
+        Opens a color selection dialog and updates the selected color.
+        """
         color = menu_utils.choose_color()
         if color:
             self.set_selected_color(color)
 
     def set_selected_color(self, color):
-        """Updates the selected color."""
+        """
+        Updates the selected drawing color.
+        
+        :param color: New color value.
+        """
         self.selected_color = color
-        print(f"Updated selected color: {self.selected_color}")
+        print(f"Updated selected color for line: {self.selected_color}")
         if self.color_button:
             self.color_button.config(bg=self.selected_color)
 
+    # line drawing
     def get_coordinates(self, event):
+        """
+        Handles user clicks to capture coordinates for drawing a line.
+        
+        :param event: Tkinter event containing click coordinates.
+        """
         if self.x1 is None and self.y1 is None:  
             self.x1, self.y1 = event.x, event.y
-            print(f"select coord 1: ({self.x1}, {self.y1})")
             canvas_utils.draw_pixel(self.canvas, self.x1, self.y1, self.selected_color)
         else:
             self.x2, self.y2 = event.x, event.y
-            print(f"select coord 2: ({self.x2}, {self.y2})")
             canvas_utils.draw_pixel(self.canvas, self.x2, self.y2, self.selected_color)
-            
+        
             transformed_x1 = canvas_utils.transform_coords_to_center(self.x1, "x", self.canvas)
             transformed_y1 = canvas_utils.transform_coords_to_center(self.y1, "y", self.canvas)
             transformed_x2 = canvas_utils.transform_coords_to_center(self.x2, "x", self.canvas)
             transformed_y2 = canvas_utils.transform_coords_to_center(self.y2, "y", self.canvas)
-            print(f"line ({transformed_x1}, {transformed_y1}), ({transformed_x2}, {transformed_y2})")
-            
+    
             new_line = Line(transformed_x1, transformed_y1, transformed_x2, transformed_y2, self.selected_color, self.selected_method)
             self.draw_line(new_line)
             self.lines.append(new_line)
             self.x1 = self.y1 = self.x2 = self.y2 = None
 
     def draw_line(self, line):
-        print(f"line ({line.x1}, {line.y1}), ({line.x2}, {line.y2})")
+        """
+        Draws a stored line on the canvas.
+        
+        :param line: Line object containing coordinates and drawing method.
+        """
+        print(f"Drawing line: {line}")
         recovered_x1 = canvas_utils.transform_coords_from_center(line.x1, "x", self.canvas)
         recovered_y1 = canvas_utils.transform_coords_from_center(line.y1, "y", self.canvas)
         recovered_x2 = canvas_utils.transform_coords_from_center(line.x2, "x", self.canvas)
         recovered_y2 = canvas_utils.transform_coords_from_center(line.y2, "y", self.canvas)
+        
+        canvas_utils.draw_pixel(self.canvas, recovered_x1, recovered_y1, line.color)
+        canvas_utils.draw_pixel(self.canvas, recovered_x2, recovered_y2, line.color)
+        
+        print(f"Starting line creation with methood: {line.method}")
         if line.method == "DDA":
             self.dda(recovered_x1, recovered_y1, recovered_x2, recovered_y2, line.color)
         else:
             self.bresenham(recovered_x1, recovered_y1, recovered_x2, recovered_y2, line.color)
     
     def dda(self, x1, y1, x2, y2, color):
-        print("starting DDA")
+        """
+        Implements the DDA algorithm for drawing a line.
+        """
         dx = x2 - x1
         dy = y2 - y1
         x, y = x1, y1
@@ -120,7 +184,10 @@ class LineDrawer:
             canvas_utils.draw_pixel(self.canvas, round(x), round(y), color)
 
     def bresenham(self, x1, y1, x2, y2, color):
-        print("starting Bresenham")
+        """
+        Implements the Bresenham algorithm for drawing a line.
+        """
+        
         dx = abs(x2 - x1)
         dy = abs(y2 - y1)
         x, y = x1, y1
@@ -153,6 +220,3 @@ class LineDrawer:
                 else:
                     p += c1
                 canvas_utils.draw_pixel(self.canvas, x, y, color)
-
-    def reset(self):
-        self.lines = []
