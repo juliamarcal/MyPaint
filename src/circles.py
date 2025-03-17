@@ -118,3 +118,7 @@ class CircleDrawer:
         canvas_utils.draw_pixel(self.canvas, (xc + b), (yc - a), color)
         canvas_utils.draw_pixel(self.canvas, (xc - b), (yc + a), color)
         canvas_utils.draw_pixel(self.canvas, (xc - b), (yc - a), color)
+
+    def reset(self):
+        self.circles = []
+    

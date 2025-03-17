@@ -1,9 +1,10 @@
 import tkinter as tk
+import menu_utils
+import canvas_utils
+from lines import LineDrawer
 from circles import CircleDrawer
 from transformations import Transformations
-import clipping
-import menu_utils
-from lines import LineDrawer
+from clipping import Clipping
 
 # window config
 root = tk.Tk()
@@ -22,13 +23,15 @@ canvas.pack(fill="both", expand=True)
 line_drawer = LineDrawer(menu_frame, canvas)
 circle_drawer = CircleDrawer(menu_frame, canvas)
 transformations = Transformations(line_drawer, circle_drawer, canvas, menu_frame)
+clipping = Clipping(line_drawer, circle_drawer, canvas, menu_frame)
 
 # Dictionary of the main menu functions
 menu_functions = {
     "Reta": line_drawer.start_line,
     "Circunferência": circle_drawer.start_circle,
     "Transformações": transformations.start_transformations,
-    "Recorte": clipping.start_clipping
+    "Recorte": clipping.start_clipping,
+    "Clear": lambda: canvas_utils.clear_canvas(canvas, line_drawer, circle_drawer)
 }
 menu_utils.set_global_menu_functions(menu_functions)
 

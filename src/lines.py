@@ -86,12 +86,15 @@ class LineDrawer:
             transformed_y1 = canvas_utils.transform_coords_to_center(self.y1, "y", self.canvas)
             transformed_x2 = canvas_utils.transform_coords_to_center(self.x2, "x", self.canvas)
             transformed_y2 = canvas_utils.transform_coords_to_center(self.y2, "y", self.canvas)
+            print(f"line ({transformed_x1}, {transformed_y1}), ({transformed_x2}, {transformed_y2})")
+            
             new_line = Line(transformed_x1, transformed_y1, transformed_x2, transformed_y2, self.selected_color, self.selected_method)
             self.draw_line(new_line)
             self.lines.append(new_line)
             self.x1 = self.y1 = self.x2 = self.y2 = None
 
     def draw_line(self, line):
+        print(f"line ({line.x1}, {line.y1}), ({line.x2}, {line.y2})")
         recovered_x1 = canvas_utils.transform_coords_from_center(line.x1, "x", self.canvas)
         recovered_y1 = canvas_utils.transform_coords_from_center(line.y1, "y", self.canvas)
         recovered_x2 = canvas_utils.transform_coords_from_center(line.x2, "x", self.canvas)
@@ -150,3 +153,6 @@ class LineDrawer:
                 else:
                     p += c1
                 canvas_utils.draw_pixel(self.canvas, x, y, color)
+
+    def reset(self):
+        self.lines = []

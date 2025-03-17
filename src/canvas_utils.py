@@ -14,5 +14,9 @@ def transform_coords_from_center(coord, type, canvas):
     height = canvas.winfo_height()
     return coord + (width // 2) if type == "x" else (height // 2) - coord
 
-def clear_canvas(canvas):
+def clear_canvas(canvas, line_drawer=None, circle_drawer=None):
     canvas.delete("all")
+    if (line_drawer):
+        line_drawer.reset()
+    if (circle_drawer):
+        circle_drawer.reset()

@@ -18,11 +18,11 @@ def draw_default_menu(menu, canvas):
             "command": lambda opt=option: global_menu_functions[opt](),
             "color": "#6495ED"
         }
-        for option in global_menu_functions
+        for option in global_menu_functions if option != "Clear"
     ]
     clear_menu(menu)
     add_buttons_to_menu(menu, buttons)
-    add_button_to_menu(menu, "Limpar canvas", lambda: canvas.delete("all"), "red")
+    add_button_to_menu(menu, "Limpar canvas", global_menu_functions["Clear"], "red")
 
 def clear_menu(menu):
     """Removes all widgets from menu."""
@@ -31,12 +31,13 @@ def clear_menu(menu):
 
 def add_buttons_to_menu(menu, buttons_config):
     """Creates buttons dynamically in the menu."""
+    default_color="#6495ED"
     for btn in buttons_config:
         button = tk.Button(
             menu, 
             text=btn["text"], 
             font=("Arial", 10),
-            bg=btn["color"],
+            bg=btn.get("color", default_color),
             fg=btn.get("fg", "white"),
             width=25,
             height=1,
@@ -46,7 +47,7 @@ def add_buttons_to_menu(menu, buttons_config):
         )
         button.pack(padx=20, pady=10)
 
-def add_button_to_menu(menu, text, command, color, return_button=False):
+def add_button_to_menu(menu, text, command, color="#6495ED", return_button=False):
     """Creates a button and optionally returns the reference to the button."""
     button = tk.Button(
         menu, 
