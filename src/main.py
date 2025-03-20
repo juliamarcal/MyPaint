@@ -9,7 +9,7 @@ from clipping import Clipping
 # window config
 root = tk.Tk()
 root.title("Computação Gráfica - MyPaint")
-root.geometry("1000x800")
+root.geometry("1200x800")
 
 # create menu
 menu_frame = tk.Frame(root, width=200, bg="gray")
