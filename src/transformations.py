@@ -95,7 +95,7 @@ class Transformations:
     def apply_translation(self):
         """Applies translation using the pixel values for x and y axes."""
         
-        print(f"Applying translation T({self.slider1_value}, {self.slider2_value})")
+        print(f"\nApplying translation T({self.slider1_value}, {self.slider2_value})")
         canvas_utils.clear_canvas(self.canvas)
         lines = self.line_drawer.get_stored_lines()
         circles = self.circle_drawer.get_stored_circles()
@@ -140,7 +140,7 @@ class Transformations:
     def apply_scaling(self):
         """Applies scaling transformation based on the slider values."""
         
-        print(f"Applying scaling S({self.slider1_value}, {self.slider2_value})")
+        print(f"\nApplying scaling S({self.slider1_value}, {self.slider2_value})")
 
         canvas_utils.clear_canvas(self.canvas)
         lines = self.line_drawer.get_stored_lines()
@@ -153,30 +153,23 @@ class Transformations:
         center_x = round(sum(all_x) / len(all_x)) if all_x else 0
         center_y = round(sum(all_y) / len(all_y)) if all_y else 0
 
-        # Step 1: Translate shapes to (0,0)
+        # Translate shapes to (0,0)
         lines, circles = self.do_translation_to_coord(-center_x, -center_y, lines, circles)
 
-        # Step 2: Apply Scaling
+        # Apply Scaling
         for line in lines:
-            line.x1 = round(line.x1 * self.slider1_value)
-            line.y1 = round(line.y1 * self.slider2_value)
-            line.x2 = round(line.x2 * self.slider1_value)
-            line.y2 = round(line.y2 * self.slider2_value)
+            line.x1 = int(round(line.x1 * self.slider1_value))
+            line.y1 = int(round(line.y1 * self.slider2_value))
+            line.x2 = int(round(line.x2 * self.slider1_value))
+            line.y2 = int(round(line.y2 * self.slider2_value))
 
         for circle in circles:
-            circle.xc = round(circle.xc * self.slider1_value)
-            circle.yc = round(circle.yc * self.slider2_value)
-            circle.radius = round(circle.radius * abs((self.slider1_value + self.slider2_value) / 2))  # Prevent negative radius
+            circle.xc = int(round(circle.xc * self.slider1_value))
+            circle.yc = int(round(circle.yc * self.slider2_value))
+            circle.radius = int(round(circle.radius * abs((self.slider1_value + self.slider2_value) / 2)))
 
-        # Step 3: Translate Back to Original Position
+        # Translate shapes back to original center
         lines, circles = self.do_translation_to_coord(center_x, center_y, lines, circles)
-
-        # Ensure integer values before storing
-        for line in lines:
-            line.x1, line.y1, line.x2, line.y2 = map(int, (line.x1, line.y1, line.x2, line.y2))
-        
-        for circle in circles:
-            circle.xc, circle.yc, circle.radius = map(int, (circle.xc, circle.yc, circle.radius))
 
         self.line_drawer.set_stored_lines(lines)
         self.circle_drawer.set_stored_circles(circles)
@@ -189,32 +182,33 @@ class Transformations:
 
     def apply_rotation(self):
         """Applies rotation to stored lines using slider1_value (angle in degrees)."""
-        print(f"Applying rotation: {self.slider1_value} degrees")
+        print(f"\nApplying rotation: {self.slider1_value} degrees")
 
-        radians = math.radians(self.slider1_value) # Convert degrees to radians
+        radians = math.radians(self.slider1_value)  # Convert degrees to radians
 
-        canvas_utils.clear_canvas(self.canvas)
+        # Step 1: Find the centroid of all points
         lines = self.line_drawer.get_stored_lines()
+        all_points = [(line.x1, line.y1) for line in lines] + [(line.x2, line.y2) for line in lines]
+
+        centroid_x = sum(x for x, _ in all_points) / len(all_points)
+        centroid_y = sum(y for _, y in all_points) / len(all_points)
+        canvas_utils.clear_canvas(self.canvas)
 
         for line in lines:
-            # Step 1: Find center of the line segment
-            center_x = (line.x1 + line.x2) / 2
-            center_y = (line.y1 + line.y2) / 2
+            # Translate points so centroid is at (0,0)
+            x1_rel, y1_rel = line.x1 - centroid_x, line.y1 - centroid_y
+            x2_rel, y2_rel = line.x2 - centroid_x, line.y2 - centroid_y
 
-            # Step 2: Translate points to the origin (subtract center)
-            x1_rel, y1_rel = line.x1 - center_x, line.y1 - center_y
-            x2_rel, y2_rel = line.x2 - center_x, line.y2 - center_y
+            # Rotate points around the centroid (clockwise rotation)
+            x1_rot = x1_rel * math.cos(radians) + y1_rel * math.sin(radians)
+            y1_rot = -x1_rel * math.sin(radians) + y1_rel * math.cos(radians)
 
-            # Step 3: Rotate around the origin
-            x1_rot = x1_rel * math.cos(radians) - y1_rel * math.sin(radians)
-            y1_rot = x1_rel * math.sin(radians) + y1_rel * math.cos(radians)
+            x2_rot = x2_rel * math.cos(radians) + y2_rel * math.sin(radians)
+            y2_rot = -x2_rel * math.sin(radians) + y2_rel * math.cos(radians)
 
-            x2_rot = x2_rel * math.cos(radians) - y2_rel * math.sin(radians)
-            y2_rot = x2_rel * math.sin(radians) + y2_rel * math.cos(radians)
-
-            # Step 4: Translate points back to original center
-            line.x1, line.y1 = int(round(x1_rot + center_x)), int(round(y1_rot + center_y))
-            line.x2, line.y2 = int(round(x2_rot + center_x)), int(round(y2_rot + center_y))
+            # Translate points back to original position
+            line.x1, line.y1 = int(round(x1_rot + centroid_x)), int(round(y1_rot + centroid_y))
+            line.x2, line.y2 = int(round(x2_rot + centroid_x)), int(round(y2_rot + centroid_y))
 
         self.line_drawer.set_stored_lines(lines)
         self.circle_drawer.redraw_all_circles()
@@ -227,7 +221,7 @@ class Transformations:
 
     def apply_reflexion(self):
         """Applies reflection to stored lines and circles using dropdown1_value (axis)."""
-        print(f"Applying reflexion on \"{self.dropdown1_value}\"")
+        print(f"\nApplying reflexion on \"{self.dropdown1_value}\"")
         canvas_utils.clear_canvas(self.canvas)
         lines = self.line_drawer.get_stored_lines()
         circles = self.circle_drawer.get_stored_circles()
@@ -261,7 +255,7 @@ class Transformations:
     def apply_shearing(self):
         """Applies shearing to stored lines using dropdown1_value (axis) and slider1_value (deformation factor)."""
 
-        print("Applying sheering in \"{self.dropdown1_value}\" whith deformation of factor {self.slider1_value}")
+        print("\nApplying sheering in \"{self.dropdown1_value}\" whith deformation of factor {self.slider1_value}")
         canvas_utils.clear_canvas(self.canvas)
         lines = self.line_drawer.get_stored_lines()
 
