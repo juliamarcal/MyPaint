@@ -140,7 +140,7 @@ class LineDrawer:
             transformed_x2 = canvas_utils.transform_coords_to_center(self.x2, "x", self.canvas)
             transformed_y2 = canvas_utils.transform_coords_to_center(self.y2, "y", self.canvas)
     
-            new_line = Line(transformed_x1, transformed_y1, transformed_x2, transformed_y2, self.selected_color, self.selected_method)
+            new_line = Line(transformed_x1, transformed_y1, transformed_x2, transformed_y2, self.selected_color, self.selected_method.get())
             self.draw_line(new_line)
             self.lines.append(new_line)
             self.x1 = self.y1 = self.x2 = self.y2 = None
@@ -186,8 +186,7 @@ class LineDrawer:
     def bresenham(self, x1, y1, x2, y2, color):
         """
         Implements the Bresenham algorithm for drawing a line.
-        """
-        
+        """        
         dx = abs(x2 - x1)
         dy = abs(y2 - y1)
         x, y = x1, y1
