@@ -113,34 +113,70 @@ class Transformations:
         self.line_drawer.set_stored_lines(lines)
         self.circle_drawer.set_stored_circles(circles)
 
+    def do_translation_to_coord(self, tx, ty, lines, circles):
+        """Applies translation using the pixel values for x and y axes."""
+        lines = self.line_drawer.get_stored_lines()
+        circles = self.circle_drawer.get_stored_circles()
+        
+        for line in lines:
+            line.x1 = line.x1 + tx
+            line.y1 = line.y1 + ty
+            line.x2 = line.x2 + tx
+            line.y2 = line.y2 + ty
+        
+        for circle in circles:
+            circle.xc = circle.xc + tx
+            circle.yc = circle.yc + ty
+            
+        return lines, circles
+
     # scaling
     def draw_scaling_menu(self):
         """Displays the scaling menu options in the UI."""
-        menu_utils.add_slider_to_menu(self.menu, "escala em x", -50, 50, lambda  valor: self.update_slider_value(valor, "slider1"), initial=0)
-        menu_utils.add_slider_to_menu(self.menu, "escala em y", -50, 50, lambda  valor: self.update_slider_value(valor, "slider2"), initial=0)
+        menu_utils.add_slider_to_menu(self.menu, "escala em x", -50, 50, lambda  valor: self.update_slider_value(valor, "slider1"), initial=1)
+        menu_utils.add_slider_to_menu(self.menu, "escala em y", -50, 50, lambda  valor: self.update_slider_value(valor, "slider2"), initial=1)
         menu_utils.add_button_to_menu(self.menu, "Aplicar escala", lambda: self.apply_scaling(), "#6495ED")
     
     def apply_scaling(self):
         """Applies scaling transformation based on the slider values."""
+        
         print(f"Applying scaling S({self.slider1_value}, {self.slider2_value})")
 
         canvas_utils.clear_canvas(self.canvas)
         lines = self.line_drawer.get_stored_lines()
         circles = self.circle_drawer.get_stored_circles()
-        
-        center_x = 0
-        center_y = 0
 
+        # Compute center of all shapes
+        all_x = [line.x1 for line in lines] + [line.x2 for line in lines] + [circle.xc for circle in circles]
+        all_y = [line.y1 for line in lines] + [line.y2 for line in lines] + [circle.yc for circle in circles]
+
+        center_x = round(sum(all_x) / len(all_x)) if all_x else 0
+        center_y = round(sum(all_y) / len(all_y)) if all_y else 0
+
+        # Step 1: Translate shapes to (0,0)
+        lines, circles = self.do_translation_to_coord(-center_x, -center_y, lines, circles)
+
+        # Step 2: Apply Scaling
         for line in lines:
-            line.x1 = (line.x1 - center_x) * self.slider1_value + center_x
-            line.y1 = (line.y1 - center_y) * self.slider2_value + center_y
-            line.x2 = (line.x2 - center_x) * self.slider1_value + center_x
-            line.y2 = (line.y2 - center_y) * self.slider2_value + center_y
+            line.x1 = round(line.x1 * self.slider1_value)
+            line.y1 = round(line.y1 * self.slider2_value)
+            line.x2 = round(line.x2 * self.slider1_value)
+            line.y2 = round(line.y2 * self.slider2_value)
 
         for circle in circles:
-            circle.xc = (circle.xc - center_x) * self.slider1_value + center_x
-            circle.yc = (circle.yc - center_y) * self.slider2_value + center_y
-            circle.radius *= abs(self.slider1_value) # radius must not be negative
+            circle.xc = round(circle.xc * self.slider1_value)
+            circle.yc = round(circle.yc * self.slider2_value)
+            circle.radius = round(circle.radius * abs((self.slider1_value + self.slider2_value) / 2))  # Prevent negative radius
+
+        # Step 3: Translate Back to Original Position
+        lines, circles = self.do_translation_to_coord(center_x, center_y, lines, circles)
+
+        # Ensure integer values before storing
+        for line in lines:
+            line.x1, line.y1, line.x2, line.y2 = map(int, (line.x1, line.y1, line.x2, line.y2))
+        
+        for circle in circles:
+            circle.xc, circle.yc, circle.radius = map(int, (circle.xc, circle.yc, circle.radius))
 
         self.line_drawer.set_stored_lines(lines)
         self.circle_drawer.set_stored_circles(circles)
